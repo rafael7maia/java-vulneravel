@@ -1,14 +1,17 @@
 version: 0.2
-
 phases:
   install:
     runtime-versions:
-      java: corretto17
+      java: latest
+    commands:
+      - curl -fsSL https://raw.githubusercontent.com/ZupIT/horusec/main/deployments/scripts/install.sh | bash -s latest
   build:
     commands:
-      - echo "Iniciando build com Java 17"
-      - mvn verify sonar:sonar -Dsonar.projectKey=azuredevopsdevsecopsorgmine_java-vulneravel -Dsonar.organization=azuredevsecopsorgmine -Dsonar.host.url=https://sonarcloud.io/ -Dsonar.login=3ca521c7115e3bbac50ed922d4bdd317c204c059
-
-cache:
-  paths:
-    - '/root/.m2/**/*'
+      # Análise Semgrep
+      - docker run --rm -v $CODEBUILD_SRC_DIR:/src returntocorp/semgrep semgrep --config=auto --json --output=/src/semgrep-report.json /src
+      # Análise Horusec
+      - horusec start -p $CODEBUILD_SRC_DIR -o json -O horusec-report.json -D
+artifacts:
+  files:
+    - semgrep-report.json
+    - horusec-report.json
