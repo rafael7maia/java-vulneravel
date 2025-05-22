@@ -1,8 +1,14 @@
 version: 0.2
+
 phases:
   install:
     runtime-versions:
-      java: latest
+      java: corretto17
   build:
     commands:
+      - echo "Iniciando build com Java 17"
       - mvn verify sonar:sonar -Dsonar.projectKey=azuredevopsdevsecopsorgmine_java-vulneravel -Dsonar.organization=azuredevsecopsorgmine -Dsonar.host.url=https://sonarcloud.io/ -Dsonar.login=3ca521c7115e3bbac50ed922d4bdd317c204c059
+
+cache:
+  paths:
+    - '/root/.m2/**/*'
